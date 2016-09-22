@@ -24,7 +24,8 @@ Before running any of these processes, the SV_DIR and classpath environment vari
     -cp ${classpath} \
     -gatk ~/programs/GATK/v3.6/GenomeAnalysisTK.jar \
     -configFile ${SV_DIR}/conf/genstrip_parameters.txt \
-    -R /exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38-noalt/seq/hg38-noalt.fa -I bam_list.list \
+    -R /exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38-noalt/seq/hg38-noalt.fa \
+    -I bam_list.list \
     -md sv_meta_data/ \
     -bamFilesAreDisjoint true \  
     -jobLogDir sv_log_dir/ \

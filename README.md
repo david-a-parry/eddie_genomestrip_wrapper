@@ -107,8 +107,11 @@ Foreach output run the SVGenotyper to produce genotype outputs. For example:
     -jobLogDir sv_genotype_100kb_to_10MB/logs \
     -vcf sv_discovery_100kb_to_10Mb/sids_svdiscovery.dels.vcf \
     -parallelRecords 100 \
+    -rmd ${SV_DIR}/Homo_sapiens_assembly38 \
     -O sv_genotype_100kb_to_10MB/sids_sv_genotype.dels.vcf \
-    -run     
+    -qsub \
+    -jobNative "-cwd -V -l h_vmem=8G -l h_rt=12:00:00" \
+    -run
 
 ###CNVDiscovery###
 

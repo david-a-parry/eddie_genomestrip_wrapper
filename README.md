@@ -89,6 +89,26 @@ Run SVDiscovery in two steps for detection of *deletions only".
     -qsub
 
 
+###Deletion Genotyping###
+
+Foreach output run the SVGenotyper to produce genotype outputs. For example:
+
+    java -Xmx4g -cp ${classpath} org.broadinstitute.gatk.queue.QCommandLine \
+    -S ${SV_DIR}/qscript/SVGenotyper.q \
+    -S ${SV_DIR}/qscript/SVQScript.q \
+    -cp ${classpath} \
+    -gatk ${SV_DIR}/lib/gatk/GenomeAnalysisTK.jar \
+    -configFile ${SV_DIR}/conf/genstrip_parameters.txt \
+    -R /exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38-noalt/seq/hg38-noalt.fa \
+    -I bam_list.list \
+    -genderMapFile sv_meta_data/sample_gender.report.txt \
+    -md sv_meta_data \
+    -runDirectory sv_genotype_100kb_to_10MB \
+    -jobLogDir sv_genotype_100kb_to_10MB/logs \
+    -vcf sv_discovery_100kb_to_10Mb/sids_svdiscovery.dels.vcf \
+    -parallelRecords 100 \
+    -O sv_genotype_100kb_to_10MB/sids_sv_genotype.dels.vcf \
+    -run     
 
 ###CNVDiscovery###
 

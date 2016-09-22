@@ -18,7 +18,24 @@ Before running any of these processes, the SV_DIR and classpath environment vari
 
 ###Preprocess###
 
-java -Xmx2g -cp ${classpath}      org.broadinstitute.gatk.queue.QCommandLine      -S ${SV_DIR}/qscript/SVPreprocess.q      -S ${SV_DIR}/qscript/SVQScript.q      -cp ${classpath}      -gatk ~/programs/GATK/v3.6/GenomeAnalysisTK.jar      -configFile ${SV_DIR}/conf/genstrip_parameters.txt      -R /exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38-noalt/seq/hg38-noalt.fa -I bam_list.list   -md sv_meta_data/ -bamFilesAreDisjoint true  -jobLogDir sv_log_dir/  -genomeMaskFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.svmask.fasta  -genderMaskBedFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.gendermask.bed   -copyNumberMaskFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.gcmask.fasta -ploidyMapFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.ploidymap.txt -rmd ${SV_DIR}/Homo_sapiens_assembly38  -jobNative "-cwd -V -l h_vmem=6G -l h_rt=12:00:00" -qsub  -run
+    java -Xmx2g -cp ${classpath} org.broadinstitute.gatk.queue.QCommandLine \
+    -S ${SV_DIR}/qscript/SVPreprocess.q \
+    -S ${SV_DIR}/qscript/SVQScript.q \
+    -cp ${classpath} \
+    -gatk ~/programs/GATK/v3.6/GenomeAnalysisTK.jar \
+    -configFile ${SV_DIR}/conf/genstrip_parameters.txt \
+    -R /exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38-noalt/seq/hg38-noalt.fa -I bam_list.list \
+    -md sv_meta_data/ \
+    -bamFilesAreDisjoint true \  
+    -jobLogDir sv_log_dir/ \
+    -genomeMaskFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.svmask.fasta \
+    -genderMaskBedFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.gendermask.bed \
+    -copyNumberMaskFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.gcmask.fasta  \
+    -ploidyMapFile ${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.ploidymap.txt \
+    -rmd ${SV_DIR}/Homo_sapiens_assembly38 \
+    -jobNative "-cwd -V -l h_vmem=6G -l h_rt=12:00:00" \
+    -qsub \ 
+    -run
 
 
 ###Deletion Discovery###

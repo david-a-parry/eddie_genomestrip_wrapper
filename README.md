@@ -13,6 +13,12 @@ Before running any of these processes, the SV_DIR and classpath environment vari
 
     export SV_DIR=/exports/igmm/eddie/aitman-lab/svtoolkit
     export classpath="${SV_DIR}/lib/SVToolkit.jar:${SV_DIR}/lib/gatk/GenomeAnalysisTK.jar:${SV_DIR}/lib/gatk/Queue.jar"
+    
+You must also load some modules (htslib might not be necessary):
+
+    module load igmm/apps/R
+    module load igmm/apps/samtools/1.2
+    module load igmm/libs/htslib/1.3
 
 ##Run##
 

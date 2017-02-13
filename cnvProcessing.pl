@@ -147,7 +147,7 @@ org.broadinstitute.gatk.queue.QCommandLine \\
 -O $out_dir/sv_discovery_100kb_to_10Mb/sids_svdiscovery.dels.vcf \\
 -minimumSize 100000 \\
 -maximumSize 10000000 \\
--run\\
+-run \\
 -rmd \${SV_DIR}/Homo_sapiens_assembly38 \\
 -jobNative "-cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
 -P select.validateReadPairs:false \\

@@ -102,7 +102,7 @@ java -Xmx2g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -copyNumberMaskFile \${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.gcmask.fasta  \\
 -ploidyMapFile \${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.ploidymap.txt \\
 -rmd \${SV_DIR}/Homo_sapiens_assembly38 \\
--jobNative "-cwd -V -l h_vmem=6G -l h_rt=48:00:00" \\
+-jobNative "-M david.parry\@igmm.ed.ac.uk -m abe -cwd -V -l h_vmem=6G -l h_rt=48:00:00" \\
 -qsub \\
 -run
 EOT
@@ -125,7 +125,7 @@ java -Xmx4g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -maximumSize 100000 \\
 -run \\
 -rmd \${SV_DIR}/Homo_sapiens_assembly38 \\
--jobNative "-cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
+-jobNative "-M david.parry\@igmm.ed.ac.uk -m abe -cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
 -P select.validateReadPairs:false \\
 -qsub
 EOT
@@ -149,7 +149,7 @@ org.broadinstitute.gatk.queue.QCommandLine \\
 -maximumSize 10000000 \\
 -run \\
 -rmd \${SV_DIR}/Homo_sapiens_assembly38 \\
--jobNative "-cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
+-jobNative "-M david.parry\@igmm.ed.ac.uk -m abe -cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
 -P select.validateReadPairs:false \\
 -qsub
 EOT
@@ -168,12 +168,12 @@ java -Xmx4g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -md $out_dir/sv_meta_data \\
 -runDirectory $out_dir/sv_genotype_100bp_to_100kb \\
 -jobLogDir $out_dir/sv_genotype_100bp_to_100kb/logs \\
--vcf $out_dir/sv_discovery_100kb_to_10Mb/sids_svdiscovery.dels.vcf \\
+-vcf $out_dir/sv_discovery_100bp_to_100kb/sids_svdiscovery.dels.vcf \\
 -parallelRecords 100 \\
 -rmd \${SV_DIR}/Homo_sapiens_assembly38 \\
--O sv_genotype_100bp_to_100kb/sids_sv_genotype.dels.vcf \\
+-O $out_dir/sv_genotype_100bp_to_100kb/sids_sv_genotype.dels.vcf \\
 -qsub \\
--jobNative "-cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
+-jobNative "-M david.parry\@igmm.ed.ac.uk -m abe -cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
 -run
 EOT
     ;
@@ -187,15 +187,15 @@ java -Xmx4g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -R /exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38-noalt/seq/hg38-noalt.fa \\
 -I $bam_list \\
 -genderMapFile $out_dir/sv_meta_data/sample_gender.report.txt \\
--md sv_meta_data \\
--runDirectory $out_dir/sv_genotype_100kb_to_10MB \\
--jobLogDir $out_dir/sv_genotype_100kb_to_10MB/logs \\
+-md $out_dir/sv_meta_data \\
+-runDirectory $out_dir/sv_genotype_100kb_to_10Mb \\
+-jobLogDir $out_dir/sv_genotype_100kb_to_10Mb/logs \\
 -vcf $out_dir/sv_discovery_100kb_to_10Mb/sids_svdiscovery.dels.vcf \\
 -parallelRecords 100 \\
 -rmd \${SV_DIR}/Homo_sapiens_assembly38 \\
--O $out_dir/sv_genotype_100kb_to_10MB/sids_sv_genotype.dels.vcf \\
+-O $out_dir/sv_genotype_100kb_to_10Mb/sids_sv_genotype.dels.vcf \\
 -qsub \\
--jobNative "-cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
+-jobNative "-M david.parry\@igmm.ed.ac.uk -m abe -cwd -V -l h_vmem=8G -l h_rt=48:00:00" \\
 -run
 EOT
     ;

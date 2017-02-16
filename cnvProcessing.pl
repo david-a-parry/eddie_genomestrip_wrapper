@@ -229,9 +229,10 @@ java -Xmx4g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -ploidyMapFile \${SV_DIR}/Homo_sapiens_assembly38/Homo_sapiens_assembly38.ploidymap.txt \\
 -rmd \${SV_DIR}/Homo_sapiens_assembly38 \\
 -genotypingParallelRecords 1000 \\
--jobNative \"-cwd -V -l h_vmem=8G -l h_rt=48:00:00\" \\
+-jobNative "-M david.parry\@igmm.ed.ac.uk -m abe -cwd -V -l h_vmem=40G -l h_rt=48:00:00" \\
 -jobWrapperScript ./job_wrapper.pl \\
 --intervalList  chr$chrom \\
+-memLimit 16 \\
 -qsub \\
 -run
 EOT

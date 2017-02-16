@@ -15,7 +15,7 @@ EOT
 my @job_native = ();
 for (my $i = 0; $i < @ARGV; $i++){
     $ARGV[$i] =~ s/'//g;
-    if ($ARGV[$i] =~ /^(-M\s+|-m\s+|-cwd|-V|-l|h_vmem=\d+G|h_rt=\d+:\d+:\d+|h_vmem=\d+G)/){ 
+    if ($ARGV[$i] =~ /^(-M\s+|-m\s+|-cwd|-V|-l|h_vmem=\d+G|h_rt=\d+:\d+:\d+|h_rss=\d+G)/){ 
         push @job_native, $ARGV[$i];
     }elsif ($ARGV[$i] =~ /^(-M|-m)$/){#get this and next arg (value) - e.g. -M me@gmail.com
         push @job_native, "$ARGV[$i] $ARGV[++$i]";

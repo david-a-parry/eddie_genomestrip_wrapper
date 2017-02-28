@@ -4,8 +4,23 @@ use warnings;
 use POSIX qw/ strftime /;
 use FindBin qw($RealBin);
 use Data::Dumper;
+use Getopt::Long;
+my %opts = ();
 
 my $job_wrapper = "$RealBin/job_wrapper.pl";
+my $config_manta = "/gpfs/igmmfs01/eddie/aitman-lab/manta-1.0.3.centos5_x86_64/bin/configManta.py";
+GetOptions
+(
+    \%opts,
+    'p|split_by_chrom',
+    'h|help'
+) or die "Error in options: $!\n";
+usage() if $opts{h};
+
+sub usage{
+    die "Help to go here...\n";
+}
+
 if (@ARGV != 1){
     die <<EOT
 
@@ -47,6 +62,15 @@ sub processBatch{
         "bams/batch_$n", 
         "subscripts/batch_$n",
     );
+
+    my $manta_script = makeMantaScript
+    (
+        $batch,
+        "bams/batch_$n", 
+        "output/batch_$n",
+        "subscripts/batch_$n",
+    );
+    
     my $process_script = makeProcessScript
     (
         $bam_list,
@@ -60,6 +84,43 @@ sub processBatch{
         "subscripts/batch_$n",
     );
     #qsubScripts($get_script, $process_script, $give_script);
+}
+
+#################################################
+sub makeMantaScript{
+    my ($bams, $bam_dir, $out_dir, $script_dir) = @_;
+    if (not -d $out_dir){
+        mkdir $out_dir or die "could not create dir $out_dir: $!\n";
+    }
+    my $manta_work = "$out_dir/manta";
+    if (not -d $manta_work){
+        mkdir ("$manta_work") or die "Could not create $manta_work directory: $!\n";
+    }
+    my $cmds_file = "$script_dir/manta_cmds.sh";
+    open (my $CMDS, ">", $cmds_file) or die "Could not write to $cmds_file: $!\n";
+    my @bs =
+    my $bam_string = join('', map {"--bam=$bam_dir/$_ \\\n"} @$bams);
+    print $CMDS <<EOT
+#!/bin/bash
+#
+#\$ -N manta_batch_$n
+#\$ -cwd
+#\$ -V
+#\$ -l h_rt=48:00:00 
+#\$ -l h_vmem=4G 
+#\$ -pe sharedmem 16
+ 
+python2.7 $config_manta \\
+--runDir=$manta_work \\
+--referenceFasta=/exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38/seq/hg38.fa \\
+$bam_string
+
+python2.7 $manta_work/runWorkflow.py -m local -j 16
+
+EOT
+    ;
+    close $CMDS;
+    return $cmds_file;
 }
 
 #################################################
@@ -199,16 +260,59 @@ java -Xmx4g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -run
 EOT
     ;
-    my @sv_gt_cmds = ();
+    my @sv_gt_cmds = getSvGtCommands($bam_list, $out_dir);
+
+    my $cmds_file = "$script_dir/gt_cmds.sh";
+    open (my $CMDS, ">", $cmds_file) or die "Could not write to $cmds_file: $!\n";
+    print $CMDS join("\n\n", $pre, $del1, $del2, $delgt1, $delgt2, @sv_gt_cmds)."\n";
+    close $CMDS;
+    
+    #my $done_file = "$script_dir/gt_cmds_done.txt";
+    #open (my $DONE, ">", $done_file) or die "Could not write to $done_file: $!\n";
+    #foreach my $c ($pre, $del1, $del2, $delgt1, $delgt2, @sv_gt_cmds){
+    #    system("$c");
+    #    my $status = check_exit($?);
+    #    print $DONE "CMD: $c\nEXIT: $?\nMSG:$status\n\n";
+    #}
+    #close $DONE;
+    return $cmds_file;
+}
+
+#################################################
+sub getSvGtCommands{
+    my ($bam_list, $out_dir) = @_;
+    if ($opts{p}){
+        return callCnvByChromosome($bam_list, $out_dir); 
+    }
+    return  ( getCnvCommand($bam_list, $out_dir) );
+}
+
+#################################################
+sub callCnvByChromosome{
+    my ($bam_list, $out_dir) = @_;
+    my @cnv_cmds = (); 
     foreach my $chrom  (1..22, "X", "Y", "M"){
-        my $dir = "$out_dir/cnv_discovery/chr$chrom";
-        my $log_dir = "$dir/logs/";
-        foreach  my $d ( $dir, $log_dir ){
-            if (not -d $d){
-                mkdir $d or die "Could not create dir $d: $!\n";
-            }
+        my $sv_gt = getCnvCommand($bam_list, $out_dir, $chrom);
+        push @cnv_cmds, $sv_gt;
+    }
+    return @cnv_cmds;
+}
+
+#################################################
+sub getCnvCommand{
+    my ($bam_list, $out_dir, $chrom) = @_;
+    
+    my $dir = "$out_dir/cnv_discovery";
+    if ($chrom){
+        $dir .= "/chr$chrom";
+    }
+    my $log_dir = "$dir/logs/";
+    foreach  my $d ( $dir, $log_dir ){
+        if (not -d $d){
+            mkdir $d or die "Could not create dir $d: $!\n";
         }
-        my $sv_gt = <<EOT
+    }
+    my $cnv_cmd = <<EOT
 java -Xmx4g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -S \${SV_DIR}/qscript/discovery/cnv/CNVDiscoveryPipeline.q \\
 -S \${SV_DIR}/qscript/SVQScript.q \\
@@ -231,29 +335,15 @@ java -Xmx4g -cp \${classpath} org.broadinstitute.gatk.queue.QCommandLine \\
 -genotypingParallelRecords 1000 \\
 -jobNative "-M david.parry\@igmm.ed.ac.uk -m abe -cwd -V -l h_vmem=40G -l h_rt=48:00:00" \\
 -jobWrapperScript ./job_wrapper.pl \\
---intervalList  chr$chrom \\
 -memLimit 16 \\
 -qsub \\
--run
 EOT
-        ;
-        push @sv_gt_cmds, $sv_gt;
+    ;
+    if ($chrom){
+        $cnv_cmd .= "--intervalList  chr$chrom ";
     }
-    
-    my $cmds_file = "$script_dir/gt_cmds.sh";
-    open (my $CMDS, ">", $cmds_file) or die "Could not write to $cmds_file: $!\n";
-    print $CMDS join("\n\n", $pre, $del1, $del2, $delgt1, $delgt2, @sv_gt_cmds)."\n";
-    close $CMDS;
-    
-    #my $done_file = "$script_dir/gt_cmds_done.txt";
-    #open (my $DONE, ">", $done_file) or die "Could not write to $done_file: $!\n";
-    #foreach my $c ($pre, $del1, $del2, $delgt1, $delgt2, @sv_gt_cmds){
-    #    system("$c");
-    #    my $status = check_exit($?);
-    #    print $DONE "CMD: $c\nEXIT: $?\nMSG:$status\n\n";
-    #}
-    #close $DONE;
-    return $cmds_file;
+    $cnv_cmd .= "-run";
+    return $cnv_cmd;
 }
 
 #################################################
@@ -288,7 +378,7 @@ sub makeStageInScript{
 trap 'exit 99' sigusr1 sigusr2 sigterm
 
 # Perform copy with rsync
-rsync -vr --files-from=$files_from /exports/igmm/datastore/ $in_dir
+rsync -av --no-p --no-g --chmod=ugo=rwX  --files-from=$files_from /exports/igmm/datastore/ $in_dir
 chmod -R 700 $in_dir
 EOT
     ;
@@ -318,7 +408,7 @@ sub makeStageOutScript{
 trap 'exit 99' sigusr1 sigusr2 sigterm
 
 # Perform copy with rsync
-rsync -vrlp $out_dir /exports/igmm/eddie/igmm_datastore_MND-WGS/cnv_analysis
+rsync -vrlp $out_dir /exports/igmm/datastore/igmm_datastore_MND-WGS/cnv_analysis
 
 EOT
     ;

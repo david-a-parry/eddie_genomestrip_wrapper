@@ -32,7 +32,6 @@ while (my $dir = shift){
 die "No bams found!\n" if not @bams;
 print STDERR "Found " . scalar(@bams) . " bam files\n";
 
-my $hg38 = "/exports/igmm/software/pkg/el7/apps/bcbio/share2/genomes/Hsapiens/hg38/seq/hg38.fa";
 my $popins = "/gpfs/igmmfs01/eddie/igmm_datastore_MND-WGS/cnvs/popins-1.0.0/popins";
 my $supercontigs = "$opts{o}/supercontigs.fa";
 my $locations = "$opts{o}/locations.txt";
@@ -111,12 +110,9 @@ module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
  
-#bwa module masks samtools with its own, old version
-alias samtools=/exports/igmm/software/pkg/el7/apps/samtools/1.3/bin/samtools
-
 export LD_LIBRARY_PATH=/exports/igmm/software/pkg/el7/compilers/gcc/4.9.3/lib64/:\$LD_LIBRARY_PATH
 
-$popins assemble -p $opts{o} -r $hg38 $bam
+$popins assemble -p $opts{o} -r genome.fa $bam
 
 EOT
         ;
@@ -146,9 +142,6 @@ sub makeMergeScript{
 module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
-
-#bwa module masks samtools with its own, old version
-alias samtools=/exports/igmm/software/pkg/el7/apps/samtools/1.3/bin/samtools
 
 export LD_LIBRARY_PATH=/exports/igmm/software/pkg/el7/compilers/gcc/4.9.3/lib64/:\$LD_LIBRARY_PATH
 
@@ -184,9 +177,6 @@ module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
  
-#bwa module masks samtools with its own, old version
-alias samtools=/exports/igmm/software/pkg/el7/apps/samtools/1.3/bin/samtools
-
 export LD_LIBRARY_PATH=/exports/igmm/software/pkg/el7/compilers/gcc/4.9.3/lib64/:\$LD_LIBRARY_PATH
 
 #this assumes the input bam was named <sample_name>.bam
@@ -221,12 +211,9 @@ module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
  
-#bwa module masks samtools with its own, old version
-alias samtools=/exports/igmm/software/pkg/el7/apps/samtools/1.3/bin/samtools
-
 export LD_LIBRARY_PATH=/exports/igmm/software/pkg/el7/compilers/gcc/4.9.3/lib64/:\$LD_LIBRARY_PATH
 
-$popins place-refalign -p $opts{o} -c $supercontigs -l $locations -i $insertions -g $groups -r $hg38
+$popins place-refalign -p $opts{o} -c $supercontigs -l $locations -i $insertions -g $groups -r genome.fa
 
 EOT
     ;
@@ -258,13 +245,10 @@ module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
  
-#bwa module masks samtools with its own, old version
-alias samtools=/exports/igmm/software/pkg/el7/apps/samtools/1.3/bin/samtools
-
 export LD_LIBRARY_PATH=/exports/igmm/software/pkg/el7/compilers/gcc/4.9.3/lib64/:\$LD_LIBRARY_PATH
 
 #this assumes the input bam was named <sample_name>.bam
-$popins place-splitalign -c $supercontigs -p $opts{o} -r $hg38 $fn
+$popins place-splitalign -c $supercontigs -p $opts{o} -r genome.fa $fn
 
 EOT
         ;
@@ -295,12 +279,9 @@ module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
  
-#bwa module masks samtools with its own, old version
-alias samtools=/exports/igmm/software/pkg/el7/apps/samtools/1.3/bin/samtools
-
 export LD_LIBRARY_PATH=/exports/igmm/software/pkg/el7/compilers/gcc/4.9.3/lib64/:\$LD_LIBRARY_PATH
 
-$popins place-finish -p $opts{o} -i $insertions -r $hg38
+$popins place-finish -p $opts{o} -i $insertions -r genome.fa
 
 EOT
     ;
@@ -332,12 +313,9 @@ module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
  
-#bwa module masks samtools with its own, old version
-alias samtools=/exports/igmm/software/pkg/el7/apps/samtools/1.3/bin/samtools
-
 export LD_LIBRARY_PATH=/exports/igmm/software/pkg/el7/compilers/gcc/4.9.3/lib64/:\$LD_LIBRARY_PATH
 
-$popins genotype -p $opts{o} $fn -p $opts{o} -c $supercontigs -l $locations -i $insertions -r $hg38
+$popins genotype -p $opts{o} $fn -p $opts{o} -c $supercontigs -l $locations -i $insertions -r genome.fa
 
 
 EOT

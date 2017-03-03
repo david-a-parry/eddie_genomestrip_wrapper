@@ -49,6 +49,13 @@ my @submit = ();
 push @submit, [ makeAssembleScripts() ];
 push @submit, [ makeMergeScript() ];
 push @submit, [ makeContigmapScripts() ];
+my @contig_maps =  makeContigmapScripts(); 
+#these scripts index the supercontigs.fa file, so if started simulataneously
+#causes errors with scripts attempting to use incomplete btw indexes
+#so we need to submit the first one and wait for it to finish before submitting 
+#the remainder
+push @submit, [ $contig_maps[0] ] ;
+push @submit, [ @contig_maps[1..$#contig_maps] ] ;
 push @submit, [ makeRefAlignScript() ];
 push @submit, [ makePlaceScripts() ];
 push @submit, [ makePlaceFinishScript() ];
@@ -105,7 +112,7 @@ sub makeAssembleScripts{
 #\$ -o $script.stdout
 #\$ -V
 #\$ -l h_rt=48:00:00 
-#\$ -l h_vmem=12G 
+#\$ -l h_vmem=16G 
 module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
@@ -138,7 +145,7 @@ sub makeMergeScript{
 #\$ -o $script.stdout
 #\$ -V
 #\$ -l h_rt=48:00:00 
-#\$ -l h_vmem=12G 
+#\$ -l h_vmem=32G 
 module load igmm/libs/ncurses/6.0
 module load igmm/apps/samtools/1.3
 module load igmm/apps/bwa/0.7.12-r1039
